@@ -291,19 +291,14 @@
 					"enabled": true
 				}
 			]
-		},
-		{
-			"id": "c6f7ee6a-bfd5-4879-b5d7-3e907da35ae9",
-			"name": "My Workspace - globals",
-			"values": [
-				{
-					"key": "jwttoken",
-					"value": "null",
-					"enabled": true
-				}
-			]
 		}
 	],
 	"headerPresets": [],
-	"globals": []
+	"globals": [
+		{
+		"key": "jwttoken",
+		"value": "null",
+		"enabled": true
+		}
+	]
 }
