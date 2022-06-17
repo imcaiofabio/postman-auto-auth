@@ -1,0 +1,309 @@
+{
+	"version": 1,
+	"collections": [
+		{
+			"id": "8b8babcb-9604-46bd-bc3d-d70b10205651",
+			"uid": "0-8b8babcb-9604-46bd-bc3d-d70b10205651",
+			"name": "AutoAuth Requests",
+			"description": null,
+			"auth": null,
+			"events": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "99d964af-61c4-4c80-bcaa-7ad07851fdfc",
+						"type": "text/javascript",
+						"exec": [
+							"var baseURL = pm.environment.get('baseURL');",
+							"var username = pm.environment.get('username');",
+							"var password = pm.environment.get('password');",
+							"",
+							"var pl = require('postman-collection');",
+							"",
+							"var isValidTokenRequest = new pl.Request({",
+							"    url: baseURL + \"/api/[your_token_checker_url]\",",
+							"    method: 'GET',",
+							"    header: [",
+							"        new pl.Header({",
+							"            key: 'content-type',",
+							"            value: 'application/json',",
+							"        }),",
+							"        new pl.Header({",
+							"            key: 'acccept',",
+							"            value: '*/*',",
+							"        })",
+							"    ]",
+							"});",
+							"",
+							"",
+							"pm.sendRequest(isValidTokenRequest, function (err, response) {",
+							"    if (response.code === 403) {",
+							"        refreshToken();",
+							"    }",
+							"});",
+							"",
+							"function refreshToken() {",
+							"    var tokenRequest = new pl.Request({",
+							"    url: baseURL + \"/api/[your_auth_url]/\",",
+							"    method: 'POST',",
+							"    header: [",
+							"        new pl.Header({",
+							"            key: 'content-type',",
+							"            value: 'application/json'",
+							"        }),",
+							"        new pl.Header({",
+							"            key: 'acccept',",
+							"            value: '*/*'",
+							"        }),",
+							"    ],",
+							"    body: {",
+							"        mode: 'raw',",
+							"        raw: JSON.stringify({",
+							"            usuario: username,",
+							"            senha: password ",
+							"        })",
+							"    } ",
+							"  });",
+							"",
+							"  pm.sendRequest(tokenRequest, function (err, response) {",
+							"      if (err) {",
+							"          throw err;",
+							"      }",
+							"      ",
+							"      if (response.code !== 201) {",
+							"          throw new Error(`Erro ao fazer login em ${baseURL + \"/api/[your_auth_url]/\"}`);",
+							"      }",
+							"      ",
+							"      csrftoken = response.headers.idx(7).value;",
+							"      pm.globals.set(\"jwttoken\", csrftoken.substr(10, 64));",
+							"  });",
+							"}"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "cc73ba0e-96a2-4349-8f94-ede916798838",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"variables": [],
+			"order": [],
+			"folders_order": [
+				"7d30cf2d-7f72-4497-b12f-966fd608961a",
+				"10a6316d-9a46-49b6-a7bf-5fefe9dacbb8"
+			],
+			"protocolProfileBehavior": {},
+			"createdAt": "2021-09-22T15:34:59.488Z",
+			"folders": [
+				{
+					"id": "7d30cf2d-7f72-4497-b12f-966fd608961a",
+					"uid": "0-7d30cf2d-7f72-4497-b12f-966fd608961a",
+					"name": "Doing",
+					"description": null,
+					"auth": null,
+					"events": null,
+					"collection": "8b8babcb-9604-46bd-bc3d-d70b10205651",
+					"folder": null,
+					"order": [
+						"8590b280-14f2-41ee-874a-f52e2a258da3"
+					],
+					"folders_order": [],
+					"owner": "0",
+					"protocolProfileBehavior": {},
+					"createdAt": "2021-09-27T20:37:31.016Z",
+					"collectionId": "8b8babcb-9604-46bd-bc3d-d70b10205651",
+					"folderId": "7d30cf2d-7f72-4497-b12f-966fd608961a"
+				},
+				{
+					"id": "10a6316d-9a46-49b6-a7bf-5fefe9dacbb8",
+					"uid": "0-10a6316d-9a46-49b6-a7bf-5fefe9dacbb8",
+					"name": "Done",
+					"description": null,
+					"auth": null,
+					"events": null,
+					"collection": "8b8babcb-9604-46bd-bc3d-d70b10205651",
+					"folder": null,
+					"order": [
+						"5aa21d12-a778-4f6b-ac72-bf37b59c38ff"
+					],
+					"folders_order": [],
+					"owner": "0",
+					"protocolProfileBehavior": {},
+					"createdAt": "2021-09-27T20:38:34.101Z",
+					"collectionId": "8b8babcb-9604-46bd-bc3d-d70b10205651",
+					"folderId": "10a6316d-9a46-49b6-a7bf-5fefe9dacbb8"
+				}
+			],
+			"requests": [
+				{
+					"id": "5aa21d12-a778-4f6b-ac72-bf37b59c38ff",
+					"uid": "0-5aa21d12-a778-4f6b-ac72-bf37b59c38ff",
+					"name": "config",
+					"url": "{{baseURL}}/api/Config",
+					"description": null,
+					"data": [],
+					"dataOptions": {
+						"raw": {
+							"language": "json"
+						}
+					},
+					"dataMode": "raw",
+					"headerData": [
+						{
+							"key": "x-csrftoken",
+							"value": "{{jwttoken}}",
+							"description": "",
+							"type": "text",
+							"enabled": true
+						}
+					],
+					"method": "GET",
+					"pathVariableData": [],
+					"queryParams": [],
+					"auth": {
+						"type": "noauth",
+						"noauth": []
+					},
+					"events": null,
+					"folder": "10a6316d-9a46-49b6-a7bf-5fefe9dacbb8",
+					"responses_order": [],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"currentHelper": null,
+					"helperAttributes": null,
+					"collectionId": "8b8babcb-9604-46bd-bc3d-d70b10205651",
+					"rawModeData": "",
+					"headers": "x-csrftoken: {{jwttoken}}\n",
+					"pathVariables": {}
+				},
+				{
+					"id": "8590b280-14f2-41ee-874a-f52e2a258da3",
+					"uid": "0-8590b280-14f2-41ee-874a-f52e2a258da3",
+					"name": "config",
+					"url": "{{baseURL}}/api/Config",
+					"description": null,
+					"data": [],
+					"dataOptions": {
+						"raw": {
+							"language": "json"
+						}
+					},
+					"dataMode": "raw",
+					"headerData": [
+						{
+							"key": "x-csrftoken",
+							"value": "{{jwttoken}}",
+							"description": "",
+							"type": "text",
+							"enabled": true
+						}
+					],
+					"method": "GET",
+					"pathVariableData": [],
+					"queryParams": [],
+					"auth": {
+						"type": "noauth",
+						"noauth": []
+					},
+					"events": null,
+					"folder": "7d30cf2d-7f72-4497-b12f-966fd608961a",
+					"responses_order": [],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"currentHelper": null,
+					"helperAttributes": null,
+					"collectionId": "8b8babcb-9604-46bd-bc3d-d70b10205651",
+					"rawModeData": "",
+					"headers": "x-csrftoken: {{jwttoken}}\n",
+					"pathVariables": {}
+				}
+			]
+		}
+	],
+	"environments": [
+		{
+			"id": "5502d721-6476-4bd5-b613-3c5c850b3a5d",
+			"name": "RC",
+			"values": [
+				{
+					"key": "baseURL",
+					"value": "https://rc.your_server.com.br/",
+					"enabled": true
+				},
+				{
+					"key": "username",
+					"value": "user_auth",
+					"enabled": true
+				},
+				{
+					"key": "password",
+					"value": "password_auth",
+					"enabled": true
+				}
+			]
+		},
+		{
+			"id": "96cab51f-5a63-4f8d-acdb-c8eb1a89c054",
+			"name": "Localhost",
+			"values": [
+				{
+					"key": "baseURL",
+					"value": "http://localhost:8001",
+					"enabled": true
+				},
+				{
+					"key": "username",
+					"value": "user_auth",
+					"enabled": true
+				},
+				{
+					"key": "password",
+					"value": "password_auth",
+					"enabled": true
+				}
+			]
+		},
+		{
+			"id": "f7afc3fb-e83b-41ed-8bbd-825c39777a88",
+			"name": "Staging",
+			"values": [
+				{
+					"key": "baseURL",
+					"value": "https://staging.your_server.com.br",
+					"enabled": true
+				},
+				{
+					"key": "username",
+					"value": "user_auth",
+					"enabled": true
+				},
+				{
+					"key": "password",
+					"value": "password_auth",
+					"enabled": true
+				}
+			]
+		},
+		{
+			"id": "c6f7ee6a-bfd5-4879-b5d7-3e907da35ae9",
+			"name": "My Workspace - globals",
+			"values": [
+				{
+					"key": "jwttoken",
+					"value": "null",
+					"enabled": true
+				}
+			]
+		}
+	],
+	"headerPresets": [],
+	"globals": []
+}
